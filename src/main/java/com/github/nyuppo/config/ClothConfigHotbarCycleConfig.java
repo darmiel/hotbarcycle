@@ -11,6 +11,8 @@ public class ClothConfigHotbarCycleConfig extends HotbarCycleConfig implements C
     @ConfigEntry.Gui.Tooltip(count = 2)
     public boolean holdAndScroll = false;
 
+    public boolean reverseOnSneak = false;
+
     @ConfigEntry.Category("rows")
     @ConfigEntry.Gui.Tooltip()
     public boolean enableRow1 = true;
@@ -54,6 +56,11 @@ public class ClothConfigHotbarCycleConfig extends HotbarCycleConfig implements C
     @Override
     public boolean getHoldAndScroll() {
         return holdAndScroll;
+    }
+
+    @Override
+    public boolean isReverseOnSneak() {
+        return this.reverseOnSneak;
     }
 
     @Override
