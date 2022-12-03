@@ -53,9 +53,11 @@ public class SugarCaneDab {
             final double radius = interactionManager.getReachDistance();
             final double radiusSq = radius * radius;
 
+            final int yOffset = player.hasVehicle() ? 1 : 0;
+
             final BlockPos standingPos = player.getBlockPos();
             final List<BlockPos> check = BlockUtils.getAllInBox(
-                    standingPos.add(radius, 0, radius),
+                    standingPos.add(radius, yOffset, radius),
                     standingPos.add(-radius, 0, -radius)
             );
             for (final BlockPos pos : check) {

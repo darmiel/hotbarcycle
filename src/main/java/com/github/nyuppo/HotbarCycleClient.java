@@ -22,6 +22,7 @@ import net.minecraft.client.util.InputUtil;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
+import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,7 +99,7 @@ public class HotbarCycleClient implements ClientModInitializer {
                     if (tick.incrementAndGet() % 4 == 0) {
                         System.out.println("  Sleeping...");
                         try {
-                            Thread.sleep((long) Math.ceil((1.0/20.0) * 1000));
+                            Thread.sleep((long) Math.ceil((1.0 / 20.0) * 1000));
                         } catch (InterruptedException e) {
                             throw new RuntimeException(e);
                         }
@@ -120,6 +121,37 @@ public class HotbarCycleClient implements ClientModInitializer {
                 }
             }
         });
+
+        final KeyBinding elytraPitchKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.hotbarcycle.elytapitch",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_I,
+                "category.hotbarcycle.keybinds"
+        ));
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (elytraPitchKeyBinding.wasPressed()) {
+                final ClientPlayerEntity player = client.player;
+                if (player == null) {
+                    return;
+                }
+                final ClientPlayNetworkHandler net = client.getNetworkHandler();
+                if (net == null) {
+                    return;
+                }
+
+                float pitch = MathHelper.wrapDegrees(player.getPitch());
+                if (pitch < 0) {
+                    pitch = 45;
+                } else {
+                    pitch = -45;
+                }
+
+                // set pitch
+                player.setPitch(pitch);
+                net.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(player.getYaw(), pitch, player.isOnGround()));
+            }
+        });
+
 
         singleCycleKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.hotbarcycle.single_cycle",
