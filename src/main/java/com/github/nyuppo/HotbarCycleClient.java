@@ -76,7 +76,7 @@ public class HotbarCycleClient implements ClientModInitializer {
                 "category.hotbarcycle.keybinds"
         ));
 
-        final AtomicInteger tick = new AtomicInteger();
+        final AtomicInteger forwardTick = new AtomicInteger();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (travelKey.wasPressed()) {
                 final ClientPlayerEntity player = client.player;
@@ -96,7 +96,7 @@ public class HotbarCycleClient implements ClientModInitializer {
 
                 final int howManyTeleports = (int) Math.ceil(distance / multiplier);
                 for (int i = 0; i < howManyTeleports; i++) {
-                    if (tick.incrementAndGet() % 4 == 0) {
+                    if (forwardTick.incrementAndGet() % 4 == 0) {
                         System.out.println("  Sleeping...");
                         try {
                             Thread.sleep((long) Math.ceil((1.0 / 20.0) * 1000));
@@ -122,6 +122,7 @@ public class HotbarCycleClient implements ClientModInitializer {
             }
         });
 
+        final AtomicInteger upTick = new AtomicInteger();
         final KeyBinding elytraPitchKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.hotbarcycle.elytapitch",
                 InputUtil.Type.KEYSYM,
@@ -138,17 +139,27 @@ public class HotbarCycleClient implements ClientModInitializer {
                 if (net == null) {
                     return;
                 }
+                final double multiplier = 8.5;
+                final double distance = !player.isSneaking() ? 5 : 20;
 
-                float pitch = MathHelper.wrapDegrees(player.getPitch());
-                if (pitch < 0) {
-                    pitch = 45;
-                } else {
-                    pitch = -45;
+                final int howManyTeleports = (int) Math.ceil(distance / multiplier);
+                for (int i = 0; i < howManyTeleports; i++) {
+                    if (upTick.incrementAndGet() % 4 == 0) {
+                        System.out.println("  Sleeping...");
+                        try {
+                            Thread.sleep((long) Math.ceil((1.0 / 20.0) * 1000));
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    System.out.println("Teleport " + (i + 1) + "/" + howManyTeleports);
+                    double x = player.getX(), y = player.getY() + multiplier, z = player.getZ();
+                    net.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y, z, player.isOnGround()
+                    ));
+                    player.setPos(x, y, z);
                 }
-
-                // set pitch
-                player.setPitch(pitch);
-                net.sendPacket(new PlayerMoveC2SPacket.LookAndOnGround(player.getYaw(), pitch, player.isOnGround()));
             }
         });
 
