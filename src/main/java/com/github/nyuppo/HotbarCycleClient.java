@@ -6,6 +6,7 @@ import com.github.nyuppo.compat.VanillaClicker;
 import com.github.nyuppo.config.ClothConfigHotbarCycleConfig;
 import com.github.nyuppo.config.DefaultHotbarCycleConfig;
 import com.github.nyuppo.config.HotbarCycleConfig;
+import io.d2a.dab.SugarCaneDab;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
 import net.fabricmc.api.ClientModInitializer;
@@ -13,14 +14,19 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayNetworkHandler;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.client.network.ClientPlayerInteractionManager;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 import net.minecraft.sound.SoundCategory;
 import net.minecraft.sound.SoundEvents;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class HotbarCycleClient implements ClientModInitializer {
     private static KeyBinding cycleKeyBinding;
@@ -62,12 +68,70 @@ public class HotbarCycleClient implements ClientModInitializer {
             }
         });
 
+        final KeyBinding travelKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
+                "key.hotbarcycle.travel",
+                InputUtil.Type.KEYSYM,
+                GLFW.GLFW_KEY_O,
+                "category.hotbarcycle.keybinds"
+        ));
+
+        final AtomicInteger tick = new AtomicInteger();
+        ClientTickEvents.END_CLIENT_TICK.register(client -> {
+            while (travelKey.wasPressed()) {
+                final ClientPlayerEntity player = client.player;
+                if (player == null) {
+                    return;
+                }
+                final ClientPlayNetworkHandler net = client.getNetworkHandler();
+                if (net == null) {
+                    return;
+                }
+                final double multiplier = 8.5;
+                final double distance = !player.isSneaking() ? 100 : 400;
+
+                if (client.getCameraEntity() == null) {
+                    return;
+                }
+
+                final int howManyTeleports = (int) Math.ceil(distance / multiplier);
+                for (int i = 0; i < howManyTeleports; i++) {
+                    if (tick.incrementAndGet() % 4 == 0) {
+                        System.out.println("  Sleeping...");
+                        try {
+                            Thread.sleep((long) Math.ceil((1.0/20.0) * 1000));
+                        } catch (InterruptedException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }
+
+                    System.out.println("Teleport " + (i + 1) + "/" + howManyTeleports);
+                    double x = player.getX(), y = player.getY(), z = player.getZ();
+                    switch (client.getCameraEntity().getHorizontalFacing()) {
+                        case NORTH -> z -= multiplier;
+                        case EAST -> x += multiplier;
+                        case SOUTH -> z += multiplier;
+                        case WEST -> x -= multiplier;
+                    }
+
+                    net.sendPacket(new PlayerMoveC2SPacket.PositionAndOnGround(
+                            x, y, z, player.isOnGround()
+                    ));
+                    player.setPos(x, y, z);
+                }
+            }
+        });
+
         singleCycleKeyBinding = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.hotbarcycle.single_cycle",
                 InputUtil.Type.KEYSYM,
                 GLFW.GLFW_KEY_J,
                 "category.hotbarcycle.keybinds"
         ));
+
+        // Dab Start
+        new SugarCaneDab();
+        // Dab End
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             while (singleCycleKeyBinding.wasPressed()) {
                 if (client.player != null && client.player.getInventory() != null && !CONFIG.getHoldAndScroll()) {

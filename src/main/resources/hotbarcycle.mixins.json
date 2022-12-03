@@ -3,10 +3,9 @@
   "minVersion": "0.8",
   "package": "com.github.nyuppo.mixin",
   "compatibilityLevel": "JAVA_17",
-  "mixins": [
-  ],
   "client": [
-    "ScrollCycleMixin"
+    "ScrollCycleMixin",
+    "AttackSpeedMixin"
   ],
   "injectors": {
     "defaultRequire": 1
