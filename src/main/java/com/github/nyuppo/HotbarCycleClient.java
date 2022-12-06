@@ -6,6 +6,7 @@ import com.github.nyuppo.compat.VanillaClicker;
 import com.github.nyuppo.config.ClothConfigHotbarCycleConfig;
 import com.github.nyuppo.config.DefaultHotbarCycleConfig;
 import com.github.nyuppo.config.HotbarCycleConfig;
+import io.d2a.dab.NoFallAua;
 import io.d2a.dab.SugarCaneDab;
 import me.shedaniel.autoconfig.AutoConfig;
 import me.shedaniel.autoconfig.serializer.GsonConfigSerializer;
@@ -173,6 +174,7 @@ public class HotbarCycleClient implements ClientModInitializer {
 
         // Dab Start
         new SugarCaneDab();
+        new NoFallAua();
         // Dab End
 
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
