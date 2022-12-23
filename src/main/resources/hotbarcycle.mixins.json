@@ -5,7 +5,9 @@
   "compatibilityLevel": "JAVA_17",
   "client": [
     "ScrollCycleMixin",
-    "AttackSpeedMixin"
+    "AttackSpeedMixin",
+    "BlockBreak",
+    "LevitationGemini"
   ],
   "injectors": {
     "defaultRequire": 1

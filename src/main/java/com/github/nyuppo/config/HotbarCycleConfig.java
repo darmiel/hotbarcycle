@@ -5,6 +5,10 @@ public abstract class HotbarCycleConfig {
     public abstract boolean getReverseCycleDirection();
     public abstract boolean getHoldAndScroll();
 
+    public abstract boolean isAntiLevitate();
+    public abstract boolean isAntiFallDamage();
+    public abstract boolean isAutoFarm();
+
     public abstract boolean getEnableRow1();
     public abstract boolean getEnableRow2();
     public abstract boolean getEnableRow3();

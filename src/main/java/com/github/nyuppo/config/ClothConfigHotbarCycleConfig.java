@@ -11,6 +11,12 @@ public class ClothConfigHotbarCycleConfig extends HotbarCycleConfig implements C
     @ConfigEntry.Gui.Tooltip(count = 2)
     public boolean holdAndScroll = false;
 
+    public boolean antiLevitate = false;
+
+    public boolean antiFallDamage = false;
+
+    public boolean autoFarm = false;
+
     @ConfigEntry.Category("rows")
     @ConfigEntry.Gui.Tooltip()
     public boolean enableRow1 = true;
@@ -54,6 +60,20 @@ public class ClothConfigHotbarCycleConfig extends HotbarCycleConfig implements C
     @Override
     public boolean getHoldAndScroll() {
         return holdAndScroll;
+    }
+
+    public boolean isAntiFallDamage() {
+        return antiFallDamage;
+    }
+
+    @Override
+    public boolean isAntiLevitate() {
+        return antiLevitate;
+    }
+
+    @Override
+    public boolean isAutoFarm() {
+        return autoFarm;
     }
 
     @Override

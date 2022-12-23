@@ -1,10 +1,9 @@
 package io.d2a.dab;
 
+import com.github.nyuppo.HotbarCycleClient;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
-import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.network.ClientPlayNetworkHandler;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.client.world.ClientWorld;
 import net.minecraft.network.packet.c2s.play.PlayerMoveC2SPacket;
 
 public class NoFallAua {
@@ -15,9 +14,12 @@ public class NoFallAua {
             if (player == null) {
                 return;
             }
+            if (!HotbarCycleClient.getConfig().isAntiFallDamage()) {
+                return;
+            }
             // reset fall damage every 10 blocks
             if (player.fallDistance > player.getSafeFallDistance()) {
-                if (player.hasVehicle()) {
+                if (player.hasVehicle() || player.isFallFlying()) {
                     return;
                 }
 

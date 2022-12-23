@@ -17,6 +17,21 @@ public class DefaultHotbarCycleConfig extends HotbarCycleConfig {
     }
 
     @Override
+    public boolean isAntiLevitate() {
+        return false;
+    }
+
+    @Override
+    public boolean isAutoFarm() {
+        return false;
+    }
+
+    @Override
+    public boolean isAntiFallDamage() {
+        return false;
+    }
+
+    @Override
     public boolean getEnableRow1() {
         return true;
     }
